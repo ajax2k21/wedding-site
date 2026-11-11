@@ -259,9 +259,21 @@ export default function AdminPage() {
   };
 
   const handleFiles = async (fileList) => {
-    const files = Array.from(fileList || []).filter((file) => file.type.startsWith('image/'));
-    if (!files.length || !activeId) return;
-    setGalleryError('');
+    // Cloudinary's free plan rejects any single file over 10 MB.
+    const MAX_FILE_BYTES = 10 * 1024 * 1024;
+    const images = Array.from(fileList || []).filter((file) => file.type.startsWith('image/'));
+    const files = images.filter((file) => file.size <= MAX_FILE_BYTES);
+    const oversized = images.filter((file) => file.size > MAX_FILE_BYTES);
+    const limitMessage =
+      oversized.length === 1
+        ? '1 image over 10 MB was skipped.'
+        : `${oversized.length} images over 10 MB were skipped.`;
+
+    if (!files.length || !activeId) {
+      if (oversized.length) setGalleryError(limitMessage);
+      return;
+    }
+    setGalleryError(oversized.length ? limitMessage : '');
     setUploading(true);
     setProgress({ done: 0, total: files.length });
 
@@ -645,7 +657,9 @@ export default function AdminPage() {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
                     <div>
                       <h2 className="font-serif text-2xl text-white">{activeCollection.name}</h2>
-                      <p className="text-[10px] text-text-muted mt-1">{activeCollection.photos.length} photo(s)</p>
+                      <p className="text-[10px] text-text-muted mt-1">
+                        {activeCollection.photos.length} photo(s) · JPG, PNG or WebP, max 10 MB each
+                      </p>
                     </div>
 
                     <div className="flex items-center gap-2">
