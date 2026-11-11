@@ -655,7 +655,7 @@ END:VCALENDAR`;
                       type="submit"
                       className="w-full bg-gold hover:bg-white text-primary-bg font-bold py-3 px-6 rounded text-xs tracking-widest transition-all"
                     >
-                      SUBMIT RSVP
+                      CONFIRM ATTENDANCE
                     </button>
                   </form>
 
