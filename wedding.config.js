@@ -175,6 +175,12 @@ const wedding = {
     title: 'Wedding RSVP Dashboard',
     csvFilename: 'divya_shivam_guest_rsvp_list.csv',
   },
+
+  // Developer credit at the bottom of the page. Set to null to hide it.
+  credit: {
+    label: 'Made by Prashant',
+    url: 'https://ajax2k21.github.io/portfolio/',
+  },
 };
 
 export default wedding;

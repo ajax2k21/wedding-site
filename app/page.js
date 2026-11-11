@@ -706,6 +706,18 @@ END:VCALENDAR`;
               <div className="font-serif text-xl tracking-[0.2em] text-gold-light my-2">{wedding.monogram}</div>
               <div className="text-[10px] tracking-[0.3em] text-gold font-bold">{wedding.hashtag}</div>
 
+              {wedding.credit && (
+                <a
+                  href={wedding.credit.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group mt-2 inline-flex items-center gap-3 text-[9px] font-semibold uppercase tracking-[0.3em] text-text-muted/50 hover:text-gold-light transition-colors"
+                >
+                  <span className="h-[1px] w-6 bg-gold/25 group-hover:bg-gold/70 transition-colors"></span>
+                  {wedding.credit.label}
+                  <span className="h-[1px] w-6 bg-gold/25 group-hover:bg-gold/70 transition-colors"></span>
+                </a>
+              )}
 
             </footer>
 
