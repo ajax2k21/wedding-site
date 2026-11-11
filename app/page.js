@@ -70,6 +70,8 @@ export default function Page() {
   const [rsvpMessage, setRsvpMessage] = useState('');
   const [honeypot, setHoneypot] = useState('');
   const [wishes, setWishes] = useState([]);
+  const [galleryCollections, setGalleryCollections] = useState(null);
+  const [lightbox, setLightbox] = useState(null);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
@@ -127,6 +129,25 @@ export default function Page() {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    fetchGallery();
+  }, []);
+
+  useEffect(() => {
+    if (!lightbox) return;
+    const onKey = (event) => {
+      if (event.key === 'Escape') setLightbox(null);
+      if (event.key === 'ArrowRight') {
+        setLightbox((current) => current && { ...current, index: (current.index + 1) % current.photos.length });
+      }
+      if (event.key === 'ArrowLeft') {
+        setLightbox((current) => current && { ...current, index: (current.index - 1 + current.photos.length) % current.photos.length });
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [lightbox]);
+
   // Pause audio when switching tabs, resume when active (if it was playing)
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -156,6 +177,16 @@ export default function Page() {
       }
     } catch {
       // DB unreachable: keep whatever is already on screen
+    }
+  };
+
+  const fetchGallery = async () => {
+    try {
+      const res = await fetch('/api/gallery');
+      const data = await res.json();
+      if (data.success) setGalleryCollections(data.collections);
+    } catch (err) {
+      console.log('Gallery unavailable:', err);
     }
   };
 
@@ -250,6 +281,10 @@ END:VCALENDAR`;
 
   const activeFunction =
     wedding.functions.find((fn) => fn.id === activeDay) || wedding.functions[0];
+
+  const galleryGroups = (galleryCollections || []).filter((collection) => collection.photos.length > 0);
+  const staticGallery = wedding.gallery;
+  const hasGallery = galleryGroups.length > 0 || staticGallery.length > 0;
 
   return (
     <main className="min-h-screen bg-primary-bg text-text-main flex flex-col items-center relative overflow-hidden">
@@ -555,30 +590,71 @@ END:VCALENDAR`;
               </div>
             </section>
 
-            {/* GALLERY SECTION — hidden until photos are added in wedding.config.js */}
-            {wedding.gallery.length > 0 && (
-              <section className="w-full max-w-5xl mx-auto py-12 px-4 border-b border-gold/10 flex flex-col items-center">
+            {/* GALLERY SECTION — collections uploaded from /admin */}
+            {hasGallery && (
+              <section className="w-full max-w-6xl mx-auto py-14 px-4 border-b border-gold/10 flex flex-col items-center">
                 <span className="text-xs tracking-[0.3em] text-gold font-bold mb-2">MEMORIES</span>
-                <h2 className="font-serif text-3xl md:text-4xl font-light text-center text-white mb-12">Photo Gallery</h2>
+                <h2 className="font-serif text-3xl md:text-4xl font-light text-center text-white mb-14">Photo Gallery</h2>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full">
-                  {wedding.gallery.map((item) => (
-                    <div
-                      key={item.src}
-                      className="aspect-square border border-gold/10 bg-white/[0.02] rounded-lg overflow-hidden relative group hover:border-gold/40 transition-all"
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={item.src}
-                        alt={item.alt}
-                        loading="lazy"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <span className="absolute inset-x-0 bottom-0 bg-black/55 backdrop-blur-sm py-2 text-center text-[10px] tracking-wider text-text-main uppercase font-bold">
-                        {item.caption}
-                      </span>
+                <div className="w-full space-y-16">
+                  {galleryGroups.map((collection) => (
+                    <div key={collection._id}>
+                      <div className="flex items-center gap-4 md:gap-6 mb-7">
+                        <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-gold/40"></div>
+                        <div className="text-center">
+                          <h3 className="font-serif text-2xl md:text-3xl text-white tracking-wide">{collection.name}</h3>
+                          <p className="text-[9px] tracking-[0.3em] text-gold/70 uppercase mt-1">
+                            {collection.photos.length} memor{collection.photos.length === 1 ? 'y' : 'ies'}
+                          </p>
+                        </div>
+                        <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-gold/40"></div>
+                      </div>
+
+                      <div className="columns-2 md:columns-3 gap-3 md:gap-4">
+                        {collection.photos.map((photo, index) => (
+                          <button
+                            key={photo._id}
+                            onClick={() => setLightbox({ photos: collection.photos, index, name: collection.name })}
+                            className="group relative mb-3 md:mb-4 block w-full break-inside-avoid overflow-hidden rounded-xl border border-gold/10 hover:border-gold/40 transition-colors bg-black/30"
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={photo.url}
+                              alt={photo.caption || collection.name}
+                              loading="lazy"
+                              className="w-full object-cover group-hover:scale-[1.04] transition-transform duration-700"
+                            />
+                            <span className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                            {photo.caption && (
+                              <span className="absolute inset-x-0 bottom-0 px-3 pb-2 pt-8 text-left text-[9px] uppercase tracking-widest text-white/90 opacity-0 group-hover:opacity-100 transition-opacity">
+                                {photo.caption}
+                              </span>
+                            )}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   ))}
+
+                  {galleryGroups.length === 0 && staticGallery.length > 0 && (
+                    <div className="columns-2 md:columns-3 gap-3 md:gap-4">
+                      {staticGallery.map((item, index) => (
+                        <button
+                          key={item.src}
+                          onClick={() => setLightbox({ photos: staticGallery, index, name: 'Moments' })}
+                          className="group relative mb-3 md:mb-4 block w-full break-inside-avoid overflow-hidden rounded-xl border border-gold/10 hover:border-gold/40 transition-colors"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={item.src}
+                            alt={item.alt}
+                            loading="lazy"
+                            className="w-full object-cover group-hover:scale-[1.04] transition-transform duration-700"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </section>
             )}
@@ -726,6 +802,60 @@ END:VCALENDAR`;
           </motion.div>
         )}
       </AnimatePresence>
+
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-[70] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 md:p-10"
+          onClick={() => setLightbox(null)}
+        >
+          <button
+            aria-label="Close gallery"
+            onClick={() => setLightbox(null)}
+            className="absolute top-5 right-5 p-2 rounded-full border border-white/20 text-white/80 hover:text-white hover:border-white/60 transition-colors"
+          >
+            ✕
+          </button>
+
+          {lightbox.photos.length > 1 && (
+            <button
+              aria-label="Previous photo"
+              onClick={(event) => {
+                event.stopPropagation();
+                setLightbox((current) => current && { ...current, index: (current.index - 1 + current.photos.length) % current.photos.length });
+              }}
+              className="absolute left-2 md:left-8 p-3 text-4xl leading-none text-white/60 hover:text-white transition-colors"
+            >
+              ‹
+            </button>
+          )}
+
+          <figure className="max-w-5xl w-full flex flex-col items-center" onClick={(event) => event.stopPropagation()}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={lightbox.photos[lightbox.index].url || lightbox.photos[lightbox.index].src}
+              alt={lightbox.photos[lightbox.index].caption || lightbox.name}
+              className="max-h-[82vh] w-auto max-w-full rounded-lg shadow-2xl"
+            />
+            <figcaption className="mt-3 text-[10px] tracking-[0.3em] uppercase text-gold-light/80">
+              {lightbox.name}
+              {lightbox.photos[lightbox.index].caption ? ` · ${lightbox.photos[lightbox.index].caption}` : ''}
+            </figcaption>
+          </figure>
+
+          {lightbox.photos.length > 1 && (
+            <button
+              aria-label="Next photo"
+              onClick={(event) => {
+                event.stopPropagation();
+                setLightbox((current) => current && { ...current, index: (current.index + 1) % current.photos.length });
+              }}
+              className="absolute right-2 md:right-8 p-3 text-4xl leading-none text-white/60 hover:text-white transition-colors"
+            >
+              ›
+            </button>
+          )}
+        </div>
+      )}
 
       {/* PRINTABLE CARD CONTAINER (Hidden on web, visible only during print/PDF generation) */}
       <div className="print-card-container">

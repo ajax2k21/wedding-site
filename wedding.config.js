@@ -164,15 +164,18 @@ const wedding = {
     contactPhone: '9425110184',
   },
 
-  // Empty array = no Memories section. Example entry:
-  // { src: '/gallery/sangeet.jpg', alt: 'Sangeet night', caption: 'Sangeet Night' }
+  // Static fallback gallery. Photos uploaded from /admin live in MongoDB+Cloudinary
+  // and take priority; this array is only used when the database has no photos.
   gallery: [],
+
+  // Cloudinary folder prefix for admin uploads (one per wedding)
+  galleryFolder: 'divya-shivam',
 
   // First playable file wins; the rest act as fallbacks
   music: ['/wedding_song.mp3', '/peaceful_sitar.mp3'],
 
   admin: {
-    title: 'Wedding RSVP Dashboard',
+    title: 'Wedding Dashboard',
     csvFilename: 'divya_shivam_guest_rsvp_list.csv',
   },
 

@@ -29,12 +29,37 @@ connection string (local or Atlas).
 3. **Replace `public/` assets:** `wedding_card.pdf`, the two MP3s (or update `music`),
    and `background2/3/4.png` if the couple wants different art. Backgrounds contain no
    names, so they can be reused.
-4. **Optional photos:** add `{ src, alt, caption }` items to `gallery` (files in
-   `public/`) to switch on the Memories section. Empty array = section hidden.
+4. **Photos:** upload them from `/admin` → Gallery tab (needs the three
+   `CLOUDINARY_*` env vars). The static `gallery` array in the config still works
+   as a fallback when no photos have been uploaded.
 5. **Optional OG image:** `seo.ogImage` currently points at `background3.png`. Drop a
    1200×630 card into `public/` and point at it for a richer WhatsApp preview.
 6. **New env:** fresh `MONGODB_URI`, admin credentials, and `NEXT_PUBLIC_SITE_URL`.
 7. **Verify:** `npm run build`, submit one test RSVP, log in to `/admin`, delete it.
+
+## Photo gallery (Cloudinary)
+
+The admin dashboard has a **Gallery** tab: create collections, upload photos,
+rename/delete them, and reorder collections with the arrows — that order is the
+order guests see under **Memories**.
+
+- First visit seeds one collection per `functions` entry (Lagna, Tel & Mata
+  Pujan, Mandap, Tilak/Parikrama & Feast, Shubh Vidaai). Add custom collections
+  (Haldi, Sangeet, ...) as needed.
+- Uploads are signed server-side, so the Cloudinary secret never reaches the
+  browser. Each file is transformed on upload to max 1600 px wide at auto
+  quality, and served at max 1200 px in AVIF/WebP when the browser supports it.
+- Deleting a photo or collection also deletes its Cloudinary assets.
+- Free tier: 25 GB storage + 25 GB bandwidth/month; a wedding gallery of a few
+  hundred compressed photos stays far below that.
+
+Required env vars (local `.env.local` and Vercel):
+
+```
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+```
 
 ## Things to know
 
