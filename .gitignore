@@ -144,3 +144,5 @@ vite.config.ts.timestamp-*
 .vercel
 .env*
 reference/
+!.env.example
+.DS_Store
