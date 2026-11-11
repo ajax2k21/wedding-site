@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const GalleryPhotoSchema = new mongoose.Schema(
   {
-    collection: {
+    collectionId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'GalleryCollection',
       required: true,

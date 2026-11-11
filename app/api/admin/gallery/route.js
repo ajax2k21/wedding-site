@@ -21,7 +21,7 @@ async function listCollections() {
 
   const byCollection = new Map();
   for (const photo of photos) {
-    const key = String(photo.collection);
+    const key = String(photo.collectionId);
     if (!byCollection.has(key)) byCollection.set(key, []);
     byCollection.get(key).push({
       _id: String(photo._id),
@@ -125,9 +125,9 @@ export async function DELETE(request) {
     const id = searchParams.get('id');
     if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
 
-    const photos = await GalleryPhoto.find({ collection: id }).lean();
+    const photos = await GalleryPhoto.find({ collectionId: id }).lean();
     await Promise.all(photos.map((photo) => destroyCloudinaryAsset(photo.publicId)));
-    await GalleryPhoto.deleteMany({ collection: id });
+    await GalleryPhoto.deleteMany({ collectionId: id });
     await GalleryCollection.findByIdAndDelete(id);
 
     return NextResponse.json({ success: true }, { status: 200 });

@@ -29,7 +29,7 @@ export async function POST(request) {
     if (!collection) return NextResponse.json({ error: 'Collection not found' }, { status: 404 });
 
     const photo = await GalleryPhoto.create({
-      collection: collection._id,
+      collectionId: collection._id,
       publicId,
       url,
       caption: (caption || '').slice(0, 100),

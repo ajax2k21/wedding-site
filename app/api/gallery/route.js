@@ -16,7 +16,7 @@ export async function GET() {
 
     const byCollection = new Map();
     for (const photo of photos) {
-      const key = String(photo.collection);
+      const key = String(photo.collectionId);
       if (!byCollection.has(key)) byCollection.set(key, []);
       byCollection.get(key).push({
         _id: String(photo._id),
