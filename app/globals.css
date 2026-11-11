@@ -1,0 +1,297 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* without A4 + zero margin Chrome prints Letter and spills to a 2nd page */
+@page {
+  size: A4;
+  margin: 0;
+}
+
+:root {
+  /* Royal Maroon Velvet + Antique Gold Temple Theme */
+  --primary-bg: #4A0013;     /* Royal Burgundy */
+  --secondary-bg: #5B0018;   /* Deep Maroon */
+
+  --gold: #d4af37;
+  --gold-light: #F4D03F;
+  --gold-dark: #aa7c11;
+
+  --text-main: #FFF8E7;      /* Warm Ivory */
+  --text-muted: #d6c9b0;
+
+  --card-bg: rgba(74, 0, 19, 0.45);
+  --border-color: rgba(212, 175, 55, 0.3);
+
+  --serif-font: 'Cormorant Garamond', serif;
+  --sans-font: 'Plus Jakarta Sans', sans-serif;
+  --hindi-font: 'Noto Serif Devanagari', serif;
+}
+
+/* Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background:
+    radial-gradient(
+      circle at center,
+      #6D0A1E 0%,
+      #5B0018 35%,
+      #3B000F 70%,
+      #220006 100%
+    );
+
+  color: var(--text-main);
+  font-family: var(--sans-font);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Text Selection */
+::selection {
+  background: var(--gold);
+  color: var(--primary-bg);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--primary-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gold-dark);
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-light);
+}
+
+/* Luxury Gold Gradient Text */
+.gold-text {
+  background: linear-gradient(
+    135deg,
+    #bf953f 0%,
+    #fcf6ba 25%,
+    #b38728 50%,
+    #fbf5b7 75%,
+    #aa771c 100%
+  );
+
+  background-size: 200% auto;
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+
+  animation: shimmer 3s linear infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* Section Divider */
+.section-divider {
+  width: 100px;
+  height: 2px;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--gold),
+    transparent
+  );
+
+  margin: 0 auto 2rem;
+}
+
+/* Premium Glass Card */
+.glass-card {
+  background: var(--card-bg);
+
+  backdrop-filter: blur(14px);
+
+  border: 1px solid var(--border-color);
+
+  border-radius: 20px;
+
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.35),
+    0 0 30px rgba(212, 175, 55, 0.08);
+
+  transition: all 0.35s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-6px);
+
+  border-color: rgba(212, 175, 55, 0.5);
+
+  box-shadow:
+    0 12px 50px rgba(0, 0, 0, 0.45),
+    0 0 40px rgba(212, 175, 55, 0.15);
+}
+
+/* Custom Backgrounds for Royal Maroon Temple Theme */
+.luxury-hero {
+  background:
+    radial-gradient(
+      circle at top center,
+      #6D0A1E 0%,
+      #5B0018 35%,
+      #3B000F 70%,
+      #220006 100%
+    );
+}
+
+.gatekeeper-bg {
+  background-image: 
+    linear-gradient(rgba(20, 4, 6, 0.1), rgba(20, 4, 6, 0.2)),
+    url('/background2.png');
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-color: #1c0306;
+  width: 100%;
+  height: 100svh;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bg {
+  background-image:
+    linear-gradient(rgba(20, 4, 6, 0.35), rgba(20, 4, 6, 0.55)),
+    url('/background3.png');
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-color: #220006;
+}
+
+.content-bg {
+  background-image:
+    linear-gradient(rgba(20, 4, 6, 0.55), rgba(20, 4, 6, 0.7)),
+    url('/background4.png');
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-color: #220006;
+}
+
+/* Animated floating gold dust */
+.gold-sparkle {
+  position: fixed;
+  top: -10px;
+  width: 5px;
+  height: 5px;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  border-radius: 50%;
+  opacity: 0.3;
+  pointer-events: none;
+  animation: floatUp 12s infinite linear;
+  z-index: 10;
+  box-shadow: 0 0 8px var(--gold-light);
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(105vh) translateX(0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-5vh) translateX(80px) scale(0.4);
+    opacity: 0;
+  }
+}
+
+/* Print styles for downloading high-fidelity PDF */
+.print-card-container {
+  display: none;
+}
+
+@media print {
+  /* Hide the interactive page elements during print */
+  main > div:not(.print-card-container),
+  .no-print {
+    display: none !important;
+  }
+
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 210mm !important;
+    height: 297mm !important;
+    background: #1a0f0a !important; /* Force luxury dark background for printed card */
+    color: #fff8ee !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Display print card container */
+  .print-card-container {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 210mm !important;
+    height: 297mm !important;
+    box-sizing: border-box;
+    padding: 35px 25px;
+    background: #1a0f0a !important;
+    color: #fff8ee !important;
+    border: 10px double #d4af37 !important;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+  }
+
+  /* Print specific element styling */
+  .print-card-container .text-white {
+    color: #ffffff !important;
+  }
+}
+
+/* Premium typography utility classes */
+.font-cinzel {
+  font-family: 'Cinzel', serif;
+}
+
+.font-cormorant {
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.font-montserrat {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.text-shadow-gold {
+  text-shadow: 0 0 35px rgba(212,175,55,0.6), 0 0 10px rgba(212,175,55,0.4);
+}
+
+.premium-backdrop {
+  backdrop-filter: blur(20px);
+}
