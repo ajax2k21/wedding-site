@@ -43,8 +43,8 @@ const wedding = {
       shortName: 'Shivam',
       initials: 'S',
       details: [
-        { label: 'Son of', value: 'Smt. Saroj & Sudhir Udeniya' },
-        { label: 'Grandson of', value: 'Late Dr. Ramsevak Udeniya & Late Smt. Premwati' },
+        { label: 'Son of', value: 'Smt. Saroj & Sudhir Udainiya' },
+        { label: 'Grandson of', value: 'Late Dr. Ramsevak Udainiya & Late Smt. Premwati' },
         { label: 'Native', value: 'Daboh, Bhind (M.P.)' },
       ],
     },
@@ -58,6 +58,9 @@ const wedding = {
   weddingDate: '2026-11-20T19:00:00+05:30',
   // The small line under the gatekeeper names
   dateRangeLabel: '14 • 16 • 19 • 20 • 21 NOVEMBER 2026',
+
+  // Prefix before the guest's name on the hero (set '' to hide it)
+  guestGreetingPrefix: 'Dear',
 
   invitation: {
     paragraph1:
@@ -160,7 +163,7 @@ const wedding = {
       { label: 'SHUBH VIDAAI', when: 'Saturday, 21st November 2026' },
     ],
     compliments:
-      'Dr. Ramprakash Joshi, Vedprakash Joshi, and the entire Joshi & Udeniya families',
+      'Dr. Ramprakash Joshi, Vedprakash Joshi, and the entire Joshi & Udainiya families',
     contactPhone: '9425110184',
   },
 

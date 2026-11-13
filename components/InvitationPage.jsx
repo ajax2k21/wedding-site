@@ -423,7 +423,7 @@ END:VCALENDAR`;
               </h1>
 
               <div className="max-w-xl mx-auto mb-5 flex flex-col items-center">
-                <p className="font-serif text-xl md:text-2xl italic text-gold-light mb-3">Dear {guestName},</p>
+                <p className="font-serif text-xl md:text-2xl italic text-gold-light mb-3">{wedding.guestGreetingPrefix ? `${wedding.guestGreetingPrefix} ` : ''}{guestName},</p>
                 <p className="text-xs md:text-sm text-text-muted leading-relaxed font-semibold mb-4">
                   {wedding.invitation.paragraph1.replace('{couple}', coupleLabel)}<br /><br />
                   {wedding.invitation.paragraph2}
