@@ -181,7 +181,8 @@ const wedding = {
 
   // Developer credit at the bottom of the page. Set to null to hide it.
   credit: {
-    label: 'Made by Prashant',
+    label: 'Crafted by me',
+    hint: 'Click here to know about me',
     url: 'https://ajax2k21.github.io/portfolio/',
   },
 };

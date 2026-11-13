@@ -312,7 +312,7 @@ END:VCALENDAR`;
         <button
           onClick={toggleMusic}
           aria-label={isPlaying ? 'Mute background music' : 'Play background music'}
-          className="fixed bottom-6 right-6 z-50 bg-secondary-bg/90 border border-gold rounded-full p-3 sm:px-5 sm:py-3 flex items-center gap-3 text-gold-light hover:text-white hover:border-white transition-all shadow-lg backdrop-blur-md text-xs font-semibold tracking-widest"
+          className="no-print fixed bottom-6 right-6 z-50 bg-secondary-bg/90 border border-gold rounded-full p-3 sm:px-5 sm:py-3 flex items-center gap-3 text-gold-light hover:text-white hover:border-white transition-all shadow-lg backdrop-blur-md text-xs font-semibold tracking-widest"
         >
           <div className="flex items-end gap-[3px] h-3">
             <span className={`w-[2px] bg-gold rounded-sm transition-all duration-300 ${isPlaying ? 'h-3 animate-[pulse_0.8s_infinite]' : 'h-1'}`}></span>
@@ -785,11 +785,18 @@ END:VCALENDAR`;
                   href={wedding.credit.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="group mt-2 inline-flex items-center gap-3 text-[9px] font-semibold uppercase tracking-[0.3em] text-text-muted/50 hover:text-gold-light transition-colors"
+                  className="group mt-2 inline-flex flex-col items-center gap-1.5 text-[9px] font-semibold uppercase tracking-[0.3em] text-text-muted/50 hover:text-gold-light transition-colors"
                 >
-                  <span className="h-[1px] w-6 bg-gold/25 group-hover:bg-gold/70 transition-colors"></span>
-                  {wedding.credit.label}
-                  <span className="h-[1px] w-6 bg-gold/25 group-hover:bg-gold/70 transition-colors"></span>
+                  <span className="inline-flex items-center gap-3">
+                    <span className="h-[1px] w-6 bg-gold/25 group-hover:bg-gold/70 transition-colors"></span>
+                    {wedding.credit.label}
+                    <span className="h-[1px] w-6 bg-gold/25 group-hover:bg-gold/70 transition-colors"></span>
+                  </span>
+                  {wedding.credit.hint && (
+                    <span className="text-[8px] tracking-[0.2em] text-gold/50 group-hover:text-gold/80 transition-colors">
+                      {wedding.credit.hint}
+                    </span>
+                  )}
                 </a>
               )}
 

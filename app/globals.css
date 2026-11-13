@@ -237,7 +237,8 @@ body {
 @media print {
   /* Hide the interactive page elements during print */
   main > div:not(.print-card-container),
-  .no-print {
+  .no-print,
+  .gold-sparkle {
     display: none !important;
   }
 
@@ -272,6 +273,12 @@ body {
   /* Print specific element styling */
   .print-card-container .text-white {
     color: #ffffff !important;
+  }
+
+  /* Keep the contact block clear of the corner ornament */
+  .print-card-container > div:last-child {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
   }
 }
 
