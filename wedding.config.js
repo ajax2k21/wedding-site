@@ -171,6 +171,9 @@ const wedding = {
   // Cloudinary folder prefix for admin uploads (one per wedding)
   galleryFolder: 'divya-shivam',
 
+  // Which gallery this page shows: 'bride' or 'groom'
+  gallerySide: 'bride',
+
   // First playable file wins; the rest act as fallbacks
   music: ['/wedding_song.mp3', '/peaceful_sitar.mp3'],
 

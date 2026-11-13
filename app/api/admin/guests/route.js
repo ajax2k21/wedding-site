@@ -1,16 +1,10 @@
 import connectDB from '@/lib/mongodb';
 import Guest from '@/models/Guest';
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-
-// Simple cookie-based auth guard
-async function isAuthenticated() {
-  const cookieStore = await cookies();
-  return cookieStore.get('admin_auth')?.value === 'authenticated';
-}
+import { getAdminSide } from '@/lib/adminAuth';
 
 export async function GET(request) {
-  if (!(await isAuthenticated())) {
+  if (!(await getAdminSide())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -44,7 +38,7 @@ export async function GET(request) {
 }
 
 export async function DELETE(request) {
-  if (!(await isAuthenticated())) {
+  if (!(await getAdminSide())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

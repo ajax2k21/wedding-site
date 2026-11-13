@@ -1,21 +1,16 @@
 import connectDB from '@/lib/mongodb';
 import GalleryCollection from '@/models/GalleryCollection';
 import GalleryPhoto from '@/models/GalleryPhoto';
-import { ensureDefaultCollections, destroyCloudinaryAsset, isCloudinaryConfigured } from '@/lib/gallery';
+import { collectionsFilter, ensureDefaultCollections, destroyCloudinaryAsset, isCloudinaryConfigured } from '@/lib/gallery';
+import { getAdminSide } from '@/lib/adminAuth';
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 
-async function isAuthenticated() {
-  const cookieStore = await cookies();
-  return cookieStore.get('admin_auth')?.value === 'authenticated';
-}
-
-async function listCollections() {
+async function listCollections(side) {
   await connectDB();
-  await ensureDefaultCollections();
+  await ensureDefaultCollections(side);
 
   const [collections, photos] = await Promise.all([
-    GalleryCollection.find().sort({ order: 1, createdAt: 1 }).lean(),
+    GalleryCollection.find(collectionsFilter(side)).sort({ order: 1, createdAt: 1 }).lean(),
     GalleryPhoto.find().sort({ createdAt: 1 }).lean(),
   ]);
 
@@ -39,12 +34,11 @@ async function listCollections() {
 }
 
 export async function GET() {
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const side = await getAdminSide();
+  if (!side) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   try {
     return NextResponse.json(
-      { success: true, collections: await listCollections(), cloudinaryReady: isCloudinaryConfigured() },
+      { success: true, side, collections: await listCollections(side), cloudinaryReady: isCloudinaryConfigured() },
       { status: 200 }
     );
   } catch (err) {
@@ -54,9 +48,8 @@ export async function GET() {
 }
 
 export async function POST(request) {
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const side = await getAdminSide();
+  if (!side) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   try {
     await connectDB();
     const { name } = await request.json();
@@ -65,14 +58,15 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Name cannot exceed 60 characters' }, { status: 400 });
     }
 
-    const last = await GalleryCollection.findOne().sort({ order: -1 }).lean();
+    const last = await GalleryCollection.findOne({ side }).sort({ order: -1 }).lean();
     const collection = await GalleryCollection.create({
       name: name.trim(),
       order: last ? last.order + 1 : 0,
+      side,
     });
 
     return NextResponse.json(
-      { success: true, collection: { _id: String(collection._id), name: collection.name, order: collection.order, photos: [] } },
+      { success: true, collection: { _id: String(collection._id), name: collection.name, order: collection.order, side, photos: [] } },
       { status: 201 }
     );
   } catch (err) {
@@ -82,9 +76,8 @@ export async function POST(request) {
 }
 
 export async function PATCH(request) {
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const side = await getAdminSide();
+  if (!side) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   try {
     await connectDB();
     const body = await request.json();
@@ -94,7 +87,7 @@ export async function PATCH(request) {
       if (ids.length === 0) return NextResponse.json({ error: 'ids required' }, { status: 400 });
       await GalleryCollection.bulkWrite(
         ids.map((id, index) => ({
-          updateOne: { filter: { _id: id }, update: { order: index } },
+          updateOne: { filter: { _id: id, side }, update: { order: index } },
         }))
       );
       return NextResponse.json({ success: true }, { status: 200 });
@@ -104,7 +97,7 @@ export async function PATCH(request) {
       if (body.name.trim().length > 60) {
         return NextResponse.json({ error: 'Name cannot exceed 60 characters' }, { status: 400 });
       }
-      await GalleryCollection.findByIdAndUpdate(body.id, { name: body.name.trim() });
+      await GalleryCollection.findOneAndUpdate({ _id: body.id, side }, { name: body.name.trim() });
       return NextResponse.json({ success: true }, { status: 200 });
     }
 
@@ -116,19 +109,20 @@ export async function PATCH(request) {
 }
 
 export async function DELETE(request) {
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const side = await getAdminSide();
+  if (!side) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   try {
     await connectDB();
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
     if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
 
-    const photos = await GalleryPhoto.find({ collectionId: id }).lean();
+    const collection = await GalleryCollection.findOneAndDelete({ _id: id, side });
+    if (!collection) return NextResponse.json({ error: 'Collection not found' }, { status: 404 });
+
+    const photos = await GalleryPhoto.find({ collectionId: collection._id }).lean();
     await Promise.all(photos.map((photo) => destroyCloudinaryAsset(photo.publicId)));
-    await GalleryPhoto.deleteMany({ collectionId: id });
-    await GalleryCollection.findByIdAndDelete(id);
+    await GalleryPhoto.deleteMany({ collectionId: collection._id });
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (err) {

@@ -12,6 +12,12 @@ const GalleryCollectionSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    side: {
+      type: String,
+      enum: ['bride', 'groom'],
+      default: 'bride',
+      index: true,
+    },
   },
   { timestamps: true }
 );

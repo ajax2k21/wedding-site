@@ -1,16 +1,19 @@
 import connectDB from '@/lib/mongodb';
 import GalleryCollection from '@/models/GalleryCollection';
 import GalleryPhoto from '@/models/GalleryPhoto';
-import { ensureDefaultCollections } from '@/lib/gallery';
+import { collectionsFilter, ensureDefaultCollections } from '@/lib/gallery';
 import { NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const side = searchParams.get('side') === 'groom' ? 'groom' : 'bride';
+
     await connectDB();
-    await ensureDefaultCollections();
+    await ensureDefaultCollections(side);
 
     const [collections, photos] = await Promise.all([
-      GalleryCollection.find().sort({ order: 1, createdAt: 1 }).lean(),
+      GalleryCollection.find(collectionsFilter(side)).sort({ order: 1, createdAt: 1 }).lean(),
       GalleryPhoto.find().sort({ createdAt: 1 }).lean(),
     ]);
 

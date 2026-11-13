@@ -1,18 +1,12 @@
 import connectDB from '@/lib/mongodb';
 import GalleryCollection from '@/models/GalleryCollection';
 import { cloudinaryConfig, cloudinaryFolder, isCloudinaryConfigured, signCloudinaryParams } from '@/lib/gallery';
+import { getAdminSide } from '@/lib/adminAuth';
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-
-async function isAuthenticated() {
-  const cookieStore = await cookies();
-  return cookieStore.get('admin_auth')?.value === 'authenticated';
-}
 
 export async function POST(request) {
-  if (!(await isAuthenticated())) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const side = await getAdminSide();
+  if (!side) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   if (!isCloudinaryConfigured()) {
     return NextResponse.json(
       { error: 'Cloudinary is not configured. Add CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET.' },
@@ -25,7 +19,7 @@ export async function POST(request) {
     const { collectionId } = await request.json();
     if (!collectionId) return NextResponse.json({ error: 'collectionId is required' }, { status: 400 });
 
-    const collection = await GalleryCollection.findById(collectionId);
+    const collection = await GalleryCollection.findOne({ _id: collectionId, side });
     if (!collection) return NextResponse.json({ error: 'Collection not found' }, { status: 404 });
 
     const { cloud, key, secret } = cloudinaryConfig();

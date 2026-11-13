@@ -180,7 +180,7 @@ export default function InvitationPage({ wedding }) {
 
   const fetchGallery = async () => {
     try {
-      const res = await fetch('/api/gallery');
+      const res = await fetch(`/api/gallery?side=${wedding.gallerySide || 'bride'}`);
       const data = await res.json();
       if (data.success) setGalleryCollections(data.collections);
     } catch (err) {

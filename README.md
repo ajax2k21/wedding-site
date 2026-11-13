@@ -37,6 +37,16 @@ connection string (local or Atlas).
 6. **New env:** fresh `MONGODB_URI`, admin credentials, and `NEXT_PUBLIC_SITE_URL`.
 7. **Verify:** `npm run build`, submit one test RSVP, log in to `/admin`, delete it.
 
+## Groom-side page (`/shivam`)
+
+- `/shivam` — groom-first version of the invitation: Shivam's details first, his
+  family's event list (from their printed card), his own PDF and his own gallery.
+- `/shivam/admin` — separate admin for the groom's side. Set
+  `SHIVAM_ADMIN_EMAIL` and `SHIVAM_ADMIN_PASSWORD` in `.env.local` and Vercel.
+- Both sides share RSVPs and the music/countdown, but gallery collections and
+  photos are tagged with a `side` (`bride` / `groom`) and are invisible to the
+  other side's admin. Cross-side deletes return 404.
+
 ## Photo gallery (Cloudinary)
 
 The admin dashboard has a **Gallery** tab: create collections, upload photos,
